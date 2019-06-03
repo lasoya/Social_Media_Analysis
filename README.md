@@ -9,9 +9,11 @@ For this project, we were interested in answering the question: is it possible t
 
 The problem evaluated in this project was: can we predict the user's overall mood based on certain features from tweets? Our thinking was that if a user is on the happier side of the spectrum, s/he is less at risk for depression than if a user is on the sadder side of the spectrum. We approached the question as a binary classification problem with our target variable as the user's overall mood (0 = happy, 1 = sad). The data used were 1-year of tweets from May 28th 2018 to May 28th 2019, scraped from Twitter using TWINT, a Python advanced scraping tool for Twitter. We scraped tweets based on specific keywords and hashtags, based on their relationships to the words happiness and depression as showed by the word network map on <a src='http://www.ritetag.com'>Ritetag.com</a>. 
 
+
 <p align='center'>
     <img src='./images/happiness_tags.png' title="Words Relational Map Around Happiness" width="425"/> <img hspace="10"/> <img src='./images/depression_tags.png' title="Words Relational Map Around Happiness" width="425"/>
 </p>
+
 
 About a half million tweets were able to be obtained, and after processing, the final dataset consisted of about 103,000 tweets. Each tweet was given a compound sentiment score using the Valence Aware Dictionary for Sentiment Reasoning (VADER), which is a model sensitive to the polarity (positive/negative) and intensity (strength) of emotion used in text sentiment analysis especially tailored for social media evaluation. Using the sentiment score for each tweet, we engineered additional variables which looked at the interactions between different features. After data processing and feature engineering, including creating dummy variables for all categorical variables, all tweets were aggregated to the user-level, with each value representing an average. After our base models, all highly correlated features (|correlation| > 0.7) were removed. The feature importance results from using the Extra Trees Classifier in Recursive Feature Elimination showed that the top 20 features were: average sentiment score of conversation, average sentiment score of each tweet user posted, and the average number of tweets user posted depending of time of day, week, month, and season. According to feature elimination, the optimal number of features for the model was 20. Our final model after Randomized Search was a Support Vector Machine model with 20 features and parameters: C = 1.1979, kernel = 'rbf', and gamma = 0.0858. The accuracy score of the model on testing data was 0.84. The confusion matrix showed that the model was pretty accurate in predicting both True Postives (predict user is sad when user is actually sad) and True Negatives (predict user is happy when user is happy).
 
@@ -71,11 +73,14 @@ We reviewed the correlation between pairs of features for feature selection. The
 - Average Number of Tweets User Posts in Spring
 - Average Number of Tweets User Posts in the Afternoon/Night
 
+
 <p align='center'>
     <img src='./images/correlation_heatmap.png' title='Correlation Heatmap'>
 </p>
 
+
 In addition, we used multiple feature importance tools to assist with feature elimination for modelling. These are the two major results:
+
 
 <b>Feature Importance Using Decision Tree Classifier</b>
 
@@ -88,16 +93,19 @@ In addition, we used multiple feature importance tools to assist with feature el
 - Average Sentiment Score of Tweet Posted Based on Day of Week
 - Average Sentiment Score of Tweet Posted Based on Time of Day
 
+
 <p align='center'>
     <img src='./images/feat_import_dtree2.png' title='Feature Importance Using Decision Tree Classifier'>
 </p>
+
 
 <b>Feature Importance Using Extra Trees Classifer through Recursive Feature Elimination</b>
 
 This was ulimately used for the final model as it was noted through feature elimination that 20 is the optimal number of features.
 
+
 <p align='center'>
-    <img src='./images/RFECV_feature_elimination.png.png' title='Recursive Feature Elimination Graph - Optimal Number of Features'>
+    <img src='./images/RFECV_feature_elimination.png' title='Recursive Feature Elimination Graph - Optimal Number of Features'>
 </p>
 
 
@@ -124,6 +132,7 @@ This was ulimately used for the final model as it was noted through feature elim
 - Average Number of Tweets Posted in Winter
 - Average Number of Tweets Posted in the Afternoon/Night (PM)
 
+
 <p align='center'>
     <img src='./images/feat_import_extra_trees.png' title='Feature Importance Using Extra Trees Classifier'>
 </p>
@@ -133,24 +142,31 @@ This was ulimately used for the final model as it was noted through feature elim
 
 Class imbalance was fixed using downsampling, which resamples the majority class to create a smaller subset of the class to match the number of samples in the minority class.
 
+<p align='center'>
 <img src='./images/class_imbalance.png' title='Class Imbalance Evaluation of Target Variable'>
+</p>
 
 
 ## Models
 
 Our initial base models (Models 1 & 2 in the below chart), without removing any features, showed an accuracy score and F1 score of 1. After removing the highly correlated features, we still obtain models with accuracy scores of mid-0.80s to 1 (Models 3 & 4 in the below chart). As we looked further into the important features, we realized that one of the features should have been removed as it was used in the creation of the target variable. Although not shown in the correlation evaluation, there is multicolinearity. After removing the 'tag' feature, which is the feature indicating what search word or hashtag was used to obtain the tweet, and after randomized search, we settled on our final model. It was a Support Vector Machine model with an accuracy score and F1 score of 0.84. 
 
+
 <p align='center'>
 <img src='./images/model_metrics.png' title='Chart of Model Metrics'>
 </p>
 
+
 A breakdown of the feature weights for the final model are shown below:
+
 
 <p align='center'>
 <img src='./images/coefficients_final_model.png' title='Chart of Coefficients for Final Model'>
 </p>
 
+
 The confusion matrix for the final model showed that it was fairly accurate in predicting True Positives (predict user is sad if actually sad) and True Negatives (predict user is happy if actually happy).
+
 
 <p align='center'>
 <img src='./images/final_model_confus_matrix.png' title='Confusion Matrix for Final Model'>
