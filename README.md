@@ -15,7 +15,7 @@ The problem evaluated in this project was: can we predict the user's overall moo
 </p>
 
 
-About a half million tweets were able to be obtained, and after processing, the final dataset consisted of about 103,000 tweets. Each tweet was given a compound sentiment score using the Valence Aware Dictionary for Sentiment Reasoning (VADER), which is a model sensitive to the polarity (positive/negative) and intensity (strength) of emotion used in text sentiment analysis especially tailored for social media evaluation. Using the sentiment score for each tweet, we engineered additional variables which looked at the interactions between different features. After data processing and feature engineering, including creating dummy variables for all categorical variables, all tweets were aggregated to the user-level, with each value representing an average. After our base models, all highly correlated features (|correlation| > 0.7) were removed. The feature importance results from using the Extra Trees Classifier in Recursive Feature Elimination showed that the top 20 features were: average sentiment score of conversation, average sentiment score of each tweet user posted, and the average number of tweets user posted depending of time of day, week, month, and season. According to feature elimination, the optimal number of features for the model was 20. Our final model after Randomized Search was a Support Vector Machine model with 20 features and parameters: C = 1.1979, kernel = 'rbf', and gamma = 0.0858. The accuracy score of the model on testing data was 0.84. The confusion matrix showed that the model was pretty accurate in predicting both True Postives (predict user is sad when user is actually sad) and True Negatives (predict user is happy when user is happy).
+About a half million tweets were able to be obtained, and after processing, the final dataset consisted of about 103,000 tweets. Each tweet was given a compound sentiment score using the Valence Aware Dictionary for Sentiment Reasoning (VADER), which is a model sensitive to the polarity (positive/negative) and intensity (strength) of emotion used in text sentiment analysis especially tailored for social media evaluation. Using the sentiment score for each tweet, we engineered additional variables which looked at the interactions between different features. After data processing and feature engineering, including creating dummy variables for all categorical variables, all tweets were aggregated to the user-level, with each value representing an average. After our base models, all highly correlated features (|correlation| > 0.7) were removed. The feature elimination results from using the Logistic Regression estimator in Recursive Feature Elimination showed that the top 20 features were: average sentiment score of conversation, average sentiment score of each tweet user posted, and the average number of tweets user posted depending of time of day, week, month, and season. According to feature elimination, the optimal number of features for the model was 20. Our final model after Randomized Search was a Support Vector Machine model with 20 features and parameters: C = 1.1979, kernel = 'rbf', and gamma = 0.0858. The accuracy score of the model on testing data was 0.84. The confusion matrix showed that the model was pretty accurate in predicting both True Postives (predict user is sad when user is actually sad) and True Negatives (predict user is happy when user is happy).
 
 
 ## Target Variable Labelling Methodology
@@ -99,74 +99,84 @@ In addition, we used multiple feature importance tools to assist with feature el
 </p>
 
 
-<b>Feature Importance Using Extra Trees Classifer through Recursive Feature Elimination</b>
+<b>Feature Selection Using Logistic Regression Classifer through Recursive Feature Elimination</b>
 
-This was ulimately used for the final model as it was noted through feature elimination that 20 is the optimal number of features.
-
-
-<p align='center'>
-    <img src='./images/RFECV_feature_elimination.png' title='Recursive Feature Elimination Graph - Optimal Number of Features'>
-</p>
-
+These features defined through Recursive Feature Elimination were ulimately used for the final model as they were noted to be the optimal 20 features.
 
 <u>Top 20 Important Features</u>
 
-- Average Number of Hashtags Used Per Tweet
-- Average Sentiment Score Per Tweet
-- Average Sentiment Score Per Conversation
-- Average Number of Tweets Posted on Monday
-- Average Number of Tweets Posted on Saturday
-- Average Number of Tweets Posted on Sunday
-- Average Number of Tweets Posted on Thursday
+- Average Number of Tweets Posted in April
 - Average Number of Tweets Posted on Tuesday
 - Average Number of Tweets Posted on Wednesday
 - Average Number of Tweets Posted in March
-- Average Number of Tweets Posted in April
+- Average Number of Tweets Posted on Monday
+- Average Number of Tweets Posted on Thursday
 - Average Number of Tweets Posted in June
-- Average Number of Tweets Posted in September
-- Average Number of Tweets Posted in October
-- Average Number of Tweets Posted in November
-- Average Number of Tweets Posted in December
-- Average Number of Tweets Posted in Spring
-- Average Number of Tweets Posted in Summer
 - Average Number of Tweets Posted in Winter
+- Average Number of Tweets Posted in November
+- Average Number of Tweets Posted in October
+- Average Sentiment Score of Each Tweet
+- Average Number of Tweets Posted in Summer
+- Average Number of Tweets Posted on Saturday
+- Average Number of Tweets Posted in September
 - Average Number of Tweets Posted in the Afternoon/Night (PM)
+- Average Number of Tweets Posted in December
+- Average Number of Hashtags Used in Each Tweet
+- Average Number of Tweets Posted on Sunday
+- Average Number of Tweets Posted in Spring
+- Average Sentiment Score of Conversation
 
 
 <p align='center'>
-    <img src='./images/feat_import_extra_trees.png' title='Feature Importance Using Extra Trees Classifier'>
-</p>
+<img src='./images/coefficients_final_model.png' title='Chart of Features and Coefficients for Final Model'>
+</p>/p>
 
 
-## Class Imbalance
+## Class Evaluation
 
-Class imbalance was fixed using downsampling, which resamples the majority class to create a smaller subset of the class to match the number of samples in the minority class.
-
-<p align='center'>
-<img src='./images/class_imbalance.png' title='Class Imbalance Evaluation of Target Variable'>
-</p>
-
-
-## Models
-
-Our initial base models (Models 1 & 2 in the below chart), without removing any features, showed an accuracy score and F1 score of 1. After removing the highly correlated features, we still obtain models with accuracy scores of mid-0.80s to 1 (Models 3 & 4 in the below chart). As we looked further into the important features, we realized that one of the features should have been removed as it was used in the creation of the target variable. Although not shown in the correlation evaluation, there is multicolinearity. After removing the 'tag' feature, which is the feature indicating what search word or hashtag was used to obtain the tweet, and after randomized search, we settled on our final model. It was a Support Vector Machine model with an accuracy score and F1 score of 0.84. 
-
+We used downsampling to minimize the influence of the majority class in the model.
 
 <p align='center'>
-<img src='./images/model_metrics.png' title='Chart of Model Metrics'>
+<img src='./images/class_evaluation.png' title='Class Evaluation of Target Variable'>
 </p>
 
 
-A breakdown of the feature weights for the final model are shown below:
+## Model Evaluation
 
+<i>Iteration 1</i>:
+
+During this iteration, we evaluated two models, Naive Bayes and Support Vector Machine. The accuracy and F1 scores of these models came back as 1, which seemed highly unlikely to us. 
 
 <p align='center'>
-<img src='./images/coefficients_final_model.png' title='Chart of Coefficients for Final Model'>
+<img src='./images/model_metrics1.png' title='Chart of Model Metrics of Iteration 1'>
 </p>
 
+<i>Iteration 2</i>:
 
+Based on iteration 1 results, we removed features that were highly correlated (|correlation| > 0.7) and reran the models. The accuracy and F1 scores of these models moved away from the perfect score but still seemed there was room for improvement. In addition, we realized that one of the features in the model was used for defining the target variable classes.
+
+<p align='center'>
+<img src='./images/model_metrics2.png' title='Chart of Model Metrics of Iteration 2'>
+</p>
+
+<i>Iteration 3</i>:
+
+Based on iteration 2 findings, we removed the feature which was used to define the target variable labels ('tag' column or dummy variables created from the 'tag' column) and reran the models including a Logistic Regression model. The accuracy and F1 scores of these models decreased but we felt that these results were more plausible. However, further exploration was needed.
+
+<p align='center'>
+<img src='./images/model_metrics3.png' title='Chart of Model Metrics of Iteration 3'>
+</p>
+
+<i>Iteration 4</i>:
+
+Based on previous findings, we used feature elimination to narrow down the optimal number of features as the prior iteration seems to indicate overfitting. In addition, we conducted Randomized Search to find the best parameters for the model. After these steps, our final model yielded 20 features.
+
+<p align='center'>
+<img src='./images/model_metrics4.png' title='Chart of Model Metrics of Iteration 4'>
+</p>
+
+<br>
 The confusion matrix for the final model showed that it was fairly accurate in predicting True Positives (predict user is sad if actually sad) and True Negatives (predict user is happy if actually happy).
-
 
 <p align='center'>
 <img src='./images/final_model_confus_matrix.png' title='Confusion Matrix for Final Model'>
@@ -175,11 +185,11 @@ The confusion matrix for the final model showed that it was fairly accurate in p
 
 ## Conclusion & Possible Applications
 
-This topic is worth further exploration. If we are able to use Twitter or other social media platforms to identify those who are at-risk for depression earlier, we can provide any necessary resources sooner for more effective treatment. However, there are some caveats. Some thoughts to keep in mind are that there may be ethical implications with employers pre-screening prospective candidates, privacy concerns regarding using social media data for diagnosis, and possible misidentification due to the error rate.
-
+This topic is worth further exploration. If we are able to use Twitter or other social media platforms to identify those who are at-risk for depression earlier, we can provide necessary resources at an earlier time for more effective treatment. However, there are some caveats. Some thoughts to keep in mind are that there may be ethical implications with employers pre-screening prospective candidates, privacy concerns regarding using social media data for diagnosis, and possible misidentification due to the error rate.
+<br>
 
 ## Recommended Next Steps
 
-- Run more models to find better models for prediction
+- Run more models to determine whether any improvement to our predictions can be made
 - Additional data cleaning can be done in consideration of data integrity and to possibly use other analysis methods to find other relationships in the data
 - Obtain medical data (if possible) to check the accuracy of the model and validate our assumptions
