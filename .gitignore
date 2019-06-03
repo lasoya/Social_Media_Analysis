@@ -110,3 +110,6 @@ venv.bak/
 *.json
 *.csv
 *.pkl
+
+#ignore Misc_Files
+Misc_Files/
